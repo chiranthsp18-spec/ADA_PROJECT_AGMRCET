@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Ambulance Routing Optimization System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="app-shell">
+        <section class="hero">
+            <div>
+                <p class="eyebrow">Emergency Routing Lab</p>
+                <h1>Ambulance Routing Optimization System</h1>
+                <p class="hero-copy">Compare Dijkstra's Algorithm with Greedy Routing using live traffic, emergency priority, and road blockages.</p>
+            </div>
+            <div class="status-chip critical-ready">Critical mode ready</div>
+        </section>
+
+        <section class="workspace">
+            <aside class="control-panel">
+                <h2>Dispatch Controls</h2>
+                <label>
+                    Start hospital node
+                    <select id="startNode"></select>
+                </label>
+                <label>
+                    Emergency destination node
+                    <select id="destinationNode"></select>
+                </label>
+                <label>
+                    Emergency level
+                    <select id="emergencyLevel">
+                        <option>Low</option>
+                        <option selected>Medium</option>
+                        <option>High</option>
+                        <option>Critical</option>
+                    </select>
+                </label>
+                <label>
+                    Traffic density
+                    <select id="trafficLevel">
+                        <option>Low</option>
+                        <option selected>Medium</option>
+                        <option>High</option>
+                    </select>
+                </label>
+
+                <div class="toggle-row">
+                    <span>Road blockage</span>
+                    <label class="switch">
+                        <input id="blockToggle" type="checkbox">
+                        <span></span>
+                    </label>
+                </div>
+
+                <label id="blockedRoadWrap" class="hidden">
+                    Block road
+                    <select id="blockedRoad"></select>
+                </label>
+
+                <div class="button-grid">
+                    <button id="findRouteBtn" class="primary-btn">Find Best Route</button>
+                    <button id="trafficBtn" class="secondary-btn">Live Traffic Update</button>
+                    <button id="replayBtn" class="secondary-btn">Replay Animation</button>
+                    <button id="exportBtn" class="secondary-btn">Export Report</button>
+                </div>
+            </aside>
+
+            <section class="map-card">
+                <div class="map-header">
+                    <div>
+                        <h2>City Road Network</h2>
+                        <p id="routeStatus">Choose inputs and calculate a route.</p>
+                    </div>
+                    <div class="legend">
+                        <span><i class="hospital-dot"></i>Hospital</span>
+                        <span><i class="emergency-dot"></i>Emergency</span>
+                        <span><i class="route-dot"></i>Route</span>
+                    </div>
+                </div>
+                <div id="graphCanvas" class="graph-canvas">
+                    <svg id="roadSvg" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+                    <div id="ambulanceDijkstra" class="ambulance ambulance-dijkstra">🚑</div>
+                    <div id="ambulanceGreedy" class="ambulance ambulance-greedy">🚑</div>
+                </div>
+            </section>
+        </section>
+
+        <section class="dashboard">
+            <article class="metric-card">
+                <p>Dijkstra route</p>
+                <h3 id="dijkstraPath">-</h3>
+                <span id="dijkstraTime">Time: -</span>
+            </article>
+            <article class="metric-card">
+                <p>Greedy route</p>
+                <h3 id="greedyPath">-</h3>
+                <span id="greedyTime">Time: -</span>
+            </article>
+            <article class="metric-card">
+                <p>Total cost</p>
+                <h3 id="costCompare">-</h3>
+                <span>Lower cost means faster practical response.</span>
+            </article>
+            <article class="metric-card highlight-card">
+                <p>Efficiency improvement</p>
+                <h3 id="efficiency">0%</h3>
+                <span>Dijkstra compared with greedy.</span>
+            </article>
+        </section>
+
+        <section class="details-grid">
+            <article class="info-panel">
+                <h2>Step-by-step Dijkstra Table</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Current</th>
+                                <th>Neighbor</th>
+                                <th>Distance</th>
+                                <th>Dynamic Weight</th>
+                                <th>Old</th>
+                                <th>New</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stepsBody">
+                            <tr><td colspan="7">No route calculated yet.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+
+            <article class="info-panel explanation">
+                <h2>Why Dijkstra Beats Greedy</h2>
+                <p>Dijkstra checks all useful possibilities in increasing cost order. It updates the best known distance for every neighbor and only finalizes a node when the shortest cost to it is confirmed.</p>
+                <p>Greedy routing only picks the next node that looks closest to the destination. That can be quick, but traffic, longer roads, or blockages can make the locally attractive choice worse overall.</p>
+                <div class="formula-box">weight = distance + traffic penalty - emergency priority adjustment</div>
+                <h3>Explored nodes</h3>
+                <p id="exploredNodes">-</p>
+            </article>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
